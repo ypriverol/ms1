@@ -1,4 +1,4 @@
-Gene,Description,Log_Conc,Zscore,Pvlue
+Gene,Description,Log_Conc,Zscore,PPvalue
 ALB,Albumin,25.25349666,4.531879134,0.999997077
 CP,Ceruloplasmin,19.66275181,3.489887908,0.999758388
 GSN,Gelsolin,18.96013772,3.358936177,0.999608784
