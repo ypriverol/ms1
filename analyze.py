@@ -20,6 +20,9 @@ dataset.head()
 
 def compute_probability(row, sample):
     abundance = row['Pvalue'] + row['PPvalue'] - (row['Pvalue'] * row['PPvalue'])
+    if np.isnan(row['Pvalue']) or np.isnan(row['PPvalue']):
+        abundance = 0.009
+
     if row['Found[' + sample + ']'] == 'High':
         abundance = 1 * row['Abundance[' + sample + ']']
     if row['Found[' + sample + ']'] == 'Peak Found':
