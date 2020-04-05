@@ -90,7 +90,7 @@ def is_decoy(row):
     decoy = 0
     if np.isnan(row['Pvalue']) and np.isnan(row['PPvalue']):
         decoy = 1
-    if row['Found[' + sample + ']'] == 'High':
+    if row['Found[' + sample + ']'] == 'High' or row['Globulins'] == 1:
         decoy = 0
     return decoy
 
@@ -111,7 +111,6 @@ dataset.head()
 
 
 for sample in samples:
-
     dataset = dataset.sort_values(by=['AbundanceRecall[' + sample + ']'], ascending=False)
     fdr_values = []
     decoy_count = 0
