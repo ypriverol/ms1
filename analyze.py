@@ -88,12 +88,13 @@ def compute_probability(row, sample):
 
 def is_decoy(row):
     decoy = 0
+    if (row['UniprotAccession'] == "Q14573"):
+        print("protein")
     if np.isnan(row['Pvalue']) and np.isnan(row['PPvalue']):
         decoy = 1
     if row['Found[' + sample + ']'] == 'High' or row['Globulins'] == 1:
         decoy = 0
     return decoy
-
 
 samples = []
 for column in list(dataset.columns.values):
@@ -104,7 +105,7 @@ for column in list(dataset.columns.values):
 samples = np.unique(np.array(samples))
 for sample in samples:
     dataset['AbundanceRecall[' + sample + ']'] = dataset.apply(lambda row: compute_probability(row, sample), axis=1)
-    dataset['Decoy'] = dataset.apply(lambda row: is_decoy(row), axis=1)
+    dataset['Decoy[' + sample + ']'] = dataset.apply(lambda row: is_decoy(row), axis=1)
 dataset.head()
 
 # In[174]:
@@ -116,7 +117,7 @@ for sample in samples:
     decoy_count = 0
     target_count = 0
     for index, row in dataset.iterrows():
-        if row['Decoy'] == 1:
+        if row['Decoy[' + sample + ']'] == 1:
             decoy_count += 1
         else:
             target_count += 1
@@ -138,8 +139,13 @@ def plot_targets_vs_decoy(fdr_thershold: float = 1.0, bins=20):
                             figsize=(15, 35))  # adjust the geometry based on your number of columns to plot
     for ax, sample in zip(axs.flatten(), samples):
         filtered_dataset = dataset.loc[dataset['FDR[' + sample + ']'] < fdr_thershold]
-        targets = filtered_dataset.loc[dataset['Decoy'] == 0]
-        decoys = filtered_dataset.loc[dataset['Decoy'] == 1]
+        for index, a in filtered_dataset.iterrows():
+            if sample == "S37" and fdr_thershold < 0.5:
+                print(str(a['UniprotAccession']) + " : " + str(a['AbundanceRecall[' + sample + ']']) + " : " + str(a['Decoy[' + sample + ']']))
+        targets = filtered_dataset.loc[dataset['Decoy[' + sample + ']'] == 0]
+        print("Sample -- " + sample + " Number of target proteins -- " + str(len(targets)))
+        decoys = filtered_dataset.loc[dataset['Decoy[' + sample + ']'] == 1]
+        print("Sample -- " + sample + " Number of decoy proteins -- " + str(len(decoys)))
         ms2 = filtered_dataset.loc[dataset['Found[' + sample + ']'] == 'High']
         ms1 = filtered_dataset.loc[dataset['Found[' + sample + ']'] == 'Peak Found']
 
@@ -176,7 +182,7 @@ plot_targets_vs_decoy(fdr_thershold=1.0)
 # In[182]:
 
 
-plot_targets_vs_decoy(fdr_thershold=0.01, bins=100)
+plot_targets_vs_decoy(fdr_thershold=0.05, bins=100)
 
 # In[ ]:
 
